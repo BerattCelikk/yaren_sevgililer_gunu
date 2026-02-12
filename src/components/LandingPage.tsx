@@ -8,27 +8,8 @@ interface LandingPageProps {
 export default function LandingPage({ onStart }: LandingPageProps) {
   return (
     <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
-      <div
-        className="absolute inset-0 bg-gradient-to-b from-purple-900 via-pink-800 to-red-900"
-        style={{
-          backgroundImage: `
-            repeating-linear-gradient(
-              0deg,
-              transparent,
-              transparent 2px,
-              rgba(0, 0, 0, 0.1) 2px,
-              rgba(0, 0, 0, 0.1) 4px
-            ),
-            repeating-linear-gradient(
-              90deg,
-              transparent,
-              transparent 2px,
-              rgba(0, 0, 0, 0.1) 2px,
-              rgba(0, 0, 0, 0.1) 4px
-            )
-          `
-        }}
-      />
+      {/* Use a simple semi-transparent overlay so the background image shows cleanly */}
+      <div className="absolute inset-0 bg-black/25" />
 
       <div className="absolute inset-0 flex items-center justify-center">
         {[...Array(20)].map((_, i) => (

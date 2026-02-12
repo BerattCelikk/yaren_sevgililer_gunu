@@ -26,7 +26,7 @@ function App() {
 
   const getCurrentBackground = () => {
     if (currentPage === 0) {
-      return undefined;
+      return '/anasayfa.png';
     }
     const scene = storyScenes[currentPage - 1];
     return scene?.videoSrc.replace('.mp4', '-poster.jpg') || undefined;
