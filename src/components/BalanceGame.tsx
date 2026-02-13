@@ -10,7 +10,7 @@ export default function BalanceGame({ onWin, onFail }: BalanceGameProps) {
   const rafRef = useRef<number | null>(null);
 
   const [marker, setMarker] = useState(50); // 0..100
-  const velocity = 0.2; // automatic drift
+  const velocity = 0.06; // automatic drift (reduced for easier control)
   const [holdingLeft, setHoldingLeft] = useState(false);
   const [holdingRight, setHoldingRight] = useState(false);
 
@@ -24,15 +24,24 @@ export default function BalanceGame({ onWin, onFail }: BalanceGameProps) {
   const maxX = 100;
 
   // green safe zone (percent) - center 40..60
-  const greenStart = 40;
-  const greenEnd = 60;
+  // make safe zone wider for easier play
+  const greenStart = 35;
+  const greenEnd = 65;
 
   // failure animation: when marker hits red region
   const handleFailure = () => {
+    if (failureRef.current) return;
+    failureRef.current = true;
     setIsShaking(true);
+    setHoldingLeft(false);
+    setHoldingRight(false);
     setTimeout(() => setIsShaking(false), 420);
     setAccumInside(0);
     onFail();
+    // small cooldown before allowing another failure
+    setTimeout(() => {
+      failureRef.current = false;
+    }, 600);
   };
 
   // controls: note spec wants left button to push marker RIGHT, right to push LEFT
@@ -47,12 +56,12 @@ export default function BalanceGame({ onWin, onFail }: BalanceGameProps) {
         let m = prev;
 
         // automatic drift (sway)
-        const sway = Math.sin(t / 350) * 0.05; // small oscillation
+        const sway = Math.sin(t / 350) * 0.02; // small oscillation
         m += velocity * dt * 10 + sway;
 
         // player inputs: left pushes marker right; right pushes marker left
-        if (holdingLeft) m += 0.8 * dt * 60; // push right
-        if (holdingRight) m -= 0.8 * dt * 60; // push left
+        if (holdingLeft) m += 1.0 * dt * 60; // push right (slightly stronger)
+        if (holdingRight) m -= 1.0 * dt * 60; // push left
 
         if (m < minX) m = minX;
         if (m > maxX) m = maxX;
@@ -71,35 +80,25 @@ export default function BalanceGame({ onWin, onFail }: BalanceGameProps) {
 
   // accumulation logic: when marker inside green zone, accumulate time
   useEffect(() => {
+    // Use RAF to check marker and accumulate; keep simple and robust
     let running = true;
-    let last = performance.now();
-
     const tick = () => {
       if (!running) return;
-      const now = performance.now();
-      const dt = (now - last) / 1000;
-      last = now;
 
       setAccumInside(prev => {
-        // check marker position
-        let inside = marker >= greenStart && marker <= greenEnd;
+        const inside = marker >= greenStart && marker <= greenEnd;
         if (inside) {
-          const next = Math.min(durationNeeded, prev + dt);
+          const next = Math.min(durationNeeded, prev + 1 / 60); // assume ~60fps
           if (next >= durationNeeded) {
-            // success
             running = false;
             onWin();
           }
           return next;
         }
 
-        // if outside and in red zone (beyond 0..100 but specifically <greenStart or >greenEnd)
-        if (marker < greenStart - 0.0001 || marker > greenEnd + 0.0001) {
-          // reset accumulation and notify a fail condition if touching red edges
-          // Consider a fail only when marker is well into red (beyond 8% from green)
-          if (marker < greenStart - 6 || marker > greenEnd + 6) {
-            handleFailure();
-          }
+        // if marker well into red, trigger failure
+        if (marker < greenStart - 6 || marker > greenEnd + 6) {
+          handleFailure();
         }
 
         return 0;
@@ -124,6 +123,18 @@ export default function BalanceGame({ onWin, onFail }: BalanceGameProps) {
 
   const remaining = Math.max(0, Math.ceil(durationNeeded - accumInside));
 
+  const failureRef = useRef(false);
+
+  // reset state when component mounts
+  useEffect(() => {
+    setMarker(50);
+    setAccumInside(0);
+    setHoldingLeft(false);
+    setHoldingRight(false);
+    setIsShaking(false);
+    failureRef.current = false;
+  }, []);
+
   return (
     <div className="fixed inset-0 z-60 flex items-center justify-center">
       <div className="w-full h-full bg-black/80 flex items-center justify-center">
@@ -138,6 +149,9 @@ export default function BalanceGame({ onWin, onFail }: BalanceGameProps) {
             <div className="relative w-full h-4 bg-red-900 rounded-md overflow-hidden">
               {/* green safe zone */}
               <div style={{ left: `${greenStart}%`, width: `${greenEnd - greenStart}%` }} className="absolute top-0 h-4 bg-green-500" />
+
+              {/* progress fill inside green zone */}
+              <div style={{ left: `${greenStart}%`, width: `${(greenEnd - greenStart) * (accumInside / durationNeeded)}%` }} className="absolute top-0 h-4 bg-white/40" />
 
               {/* marker */}
               <div style={{ left: `${marker}%` }} className="absolute top-[-8px] w-4 h-20 -translate-x-1/2 flex items-center justify-center">

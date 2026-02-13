@@ -40,12 +40,13 @@ function App() {
 
     // After scene 2 final next, start Balance (Dengeyi Koru) mini-game instead of going to scene 3
     if (currentPage === 2 && !isBalanceGameActive && !showBalanceTransition) {
+      // immediately reset counters so the game can't trigger TryAgain from old state
+      setBalanceFailCount(0);
+      setShowTryAgain(false);
       setShowBalanceTransition(true);
       setTimeout(() => {
         setShowBalanceTransition(false);
         setIsBalanceGameActive(true);
-        setBalanceFailCount(0);
-        setShowTryAgain(false);
       }, 600);
       return;
     }
@@ -84,14 +85,15 @@ function App() {
   };
 
   const handleBalanceFail = () => {
-    setBalanceFailCount(c => c + 1);
-    // if 3 consecutive fails, pause and show Try Again
-    setTimeout(() => {
-      setShowTryAgain(prev => {
-        if (balanceFailCount + 1 >= 3) return true;
-        return prev;
-      });
-    }, 250);
+    // increment count and check new value reliably; if reaches 3, pause game and show Try Again
+    setBalanceFailCount(prev => {
+      const next = prev + 1;
+      if (next >= 3) {
+        setIsBalanceGameActive(false);
+        setShowTryAgain(true);
+      }
+      return next;
+    });
   };
 
   const handleTryAgain = () => {
@@ -209,17 +211,43 @@ function App() {
                 </div>
               )}
 
-              {/* Balance reward screen */}
+              {/* Balance reward screen - show image centered in 9:16 box */}
               {showBalanceReward && (
                 <motion.div className="fixed inset-0 z-90 flex items-center justify-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                   <div className="absolute inset-0 bg-black" />
-                  <img src="/mini_games_2.png" alt="Balance Reward" className="z-20 object-cover w-screen h-screen" style={{ pointerEvents: 'none' }} onError={(e)=>{(e.currentTarget as HTMLImageElement).style.display='none'; const el = document.getElementById('balance-fallback'); if(el) el.style.display='block';}} />
-                  <div id="balance-fallback" style={{display:'none'}} className="z-20 absolute inset-0 flex items-center justify-center"> <div className="text-4xl text-pink-200">Tebrikler!</div> </div>
-                  <button aria-label="Tamam balance" onClick={handleConfirmBalanceReward} className="z-30 absolute left-1/2 top-[78%] transform -translate-x-1/2 -translate-y-1/2 w-40 h-12 bg-transparent border-0 cursor-pointer" />
+
+                  <div className="z-20 relative flex items-center justify-center">
+                    <div
+                      className="relative"
+                      style={{ width: '100%', maxWidth: '430px', aspectRatio: '9/16' }}
+                    >
+                      <img
+                        src="/mini_games_2.png"
+                        alt="Balance Reward"
+                        className="object-contain w-full h-full"
+                        style={{ pointerEvents: 'none' }}
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).style.display = 'none';
+                          const el = document.getElementById('balance-fallback');
+                          if (el) el.style.display = 'block';
+                        }}
+                      />
+
+                      <div id="balance-fallback" style={{ display: 'none' }} className="absolute inset-0 flex items-center justify-center">
+                        <div className="text-4xl text-pink-200">Tebrikler!</div>
+                      </div>
+
+                      <button
+                        aria-label="Tamam balance"
+                        onClick={handleConfirmBalanceReward}
+                        className="absolute left-1/2 top-[64%] transform -translate-x-1/2 -translate-y-1/2 w-40 h-12 bg-transparent border-0 cursor-pointer z-30"
+                      />
+                    </div>
+                  </div>
                 </motion.div>
               )}
 
-              {/* reveal on win - require user confirmation */}
+              {/* reveal on win - require user confirmation - show centered 9:16 box */}
               {showFlashY && (
                 <motion.div
                   className="fixed inset-0 z-90 flex items-center justify-center"
@@ -230,37 +258,36 @@ function App() {
                   {/* opaque backdrop to hide everything underneath */}
                   <div className="absolute inset-0 bg-black" />
 
-                  {/* full-viewport image (covers entire screen) */}
-                  <motion.img
-                    src="/mini_games_1.png"
-                    alt="İ - Reveal"
-                    initial={{ scale: 1.02, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.98, opacity: 0 }}
-                    transition={{ duration: 0.5, ease: 'easeOut' }}
-                    onError={(e) => {
-                      const img = e.currentTarget as HTMLImageElement;
-                      img.style.display = 'none';
-                      const el = document.getElementById('flash-fallback-i');
-                      if (el) el.style.display = 'block';
-                    }}
-                    className="z-20 object-cover w-screen h-screen"
-                    style={{ pointerEvents: 'none' }}
-                  />
+                  <motion.div className="z-20 flex items-center justify-center" initial={{ scale: 1.02, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.98, opacity: 0 }} transition={{ duration: 0.5, ease: 'easeOut' }}>
+                    <div className="relative" style={{ width: '100%', maxWidth: '430px', aspectRatio: '9/16' }}>
+                      <motion.img
+                        src="/mini_games_1.png"
+                        alt="İ - Reveal"
+                        onError={(e) => {
+                          const img = e.currentTarget as HTMLImageElement;
+                          img.style.display = 'none';
+                          const el = document.getElementById('flash-fallback-i');
+                          if (el) el.style.display = 'block';
+                        }}
+                        className="object-contain w-full h-full"
+                        style={{ pointerEvents: 'none' }}
+                      />
 
-                  {/* fallback big İ if image missing */}
-                  <div id="flash-fallback-i" style={{ display: 'none' }} className="z-20 absolute inset-0 flex items-center justify-center bg-black">
-                    <div className="text-9xl text-pink-300 font-bold">İ</div>
-                  </div>
+                      {/* fallback big İ if image missing */}
+                      <div id="flash-fallback-i" style={{ display: 'none' }} className="absolute inset-0 flex items-center justify-center bg-black">
+                        <div className="text-9xl text-pink-300 font-bold">İ</div>
+                      </div>
 
-                  {/* Clickable overlay mapped to the 'Tamam' artwork inside the image */}
-                  <button
-                    aria-label="Tamam - reveal confirm"
-                    onClick={handleConfirmSuccess}
-                    className="z-30 absolute left-1/2 top-[64%] transform -translate-x-1/2 -translate-y-1/2 w-40 h-12 bg-transparent border-0 cursor-pointer"
-                    style={{ WebkitTapHighlightColor: 'transparent' }}
-                    title="Tamam"
-                  />
+                      {/* Clickable overlay mapped to the 'Tamam' artwork inside the image */}
+                      <button
+                        aria-label="Tamam - reveal confirm"
+                        onClick={handleConfirmSuccess}
+                        className="absolute left-1/2 top-[64%] transform -translate-x-1/2 -translate-y-1/2 w-40 h-12 bg-transparent border-0 cursor-pointer z-30"
+                        style={{ WebkitTapHighlightColor: 'transparent' }}
+                        title="Tamam"
+                      />
+                    </div>
+                  </motion.div>
                 </motion.div>
               )}
             </>
