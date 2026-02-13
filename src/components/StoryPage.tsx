@@ -1,18 +1,36 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
 
 interface StoryPageProps {
   videoSrc: string;
-  dialogue: string;
+  dialogue: string | string[];
   onNext: () => void;
   pageNumber: number;
 }
 
 export default function StoryPage({ videoSrc, dialogue, onNext, pageNumber }: StoryPageProps) {
+  const [partIndex, setPartIndex] = useState(0);
+
+  // Reset pagination when the page changes
+  useEffect(() => {
+    setPartIndex(0);
+  }, [pageNumber]);
+
+  const dialogueParts = Array.isArray(dialogue) ? dialogue : [dialogue];
+
+  const handleClick = () => {
+    if (partIndex < dialogueParts.length - 1) {
+      setPartIndex(partIndex + 1);
+    } else {
+      onNext();
+    }
+  };
+
   return (
     <div
       className="relative w-full h-full flex flex-col overflow-hidden cursor-pointer"
-      onClick={onNext}
+      onClick={handleClick}
     >
       <video
         className="absolute inset-0 w-full h-full object-cover"
@@ -38,7 +56,7 @@ export default function StoryPage({ videoSrc, dialogue, onNext, pageNumber }: St
             <div className="flex-shrink-0 w-2 h-2 bg-pink-400 mt-2 animate-pulse" />
 
             <p className="text-pink-100 text-xs md:text-sm leading-relaxed flex-1">
-              {dialogue}
+              {dialogueParts[partIndex]}
             </p>
           </div>
 
@@ -52,7 +70,7 @@ export default function StoryPage({ videoSrc, dialogue, onNext, pageNumber }: St
               animate={{ opacity: [1, 0.5, 1] }}
               transition={{ duration: 1.5, repeat: Infinity }}
             >
-              DEVAM ET
+              {partIndex < dialogueParts.length - 1 ? 'Devam Et' : 'Peki ya sonra?'}
               <ChevronRight className="w-4 h-4" />
             </motion.div>
           </div>

@@ -47,9 +47,9 @@ export default function LandingPage({ onStart }: LandingPageProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
         >
-          VALENTINE'S
+          BİZİM
           <br />
-          STORY
+          MASALIMIZ
         </motion.h1>
 
         <motion.button
