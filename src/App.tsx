@@ -383,10 +383,7 @@ function App() {
         @keyframes fireworkPulse { 0% { opacity: 0; transform: scale(0.3); } 30% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0; transform: scale(0.6); } }
         .animate-firework { animation: fireworkPulse 1400ms ease-in-out infinite; }
       `}</style>
-      <AudioPlayer
-        audioSrc="/audio/background-music.mp3"
-        isPlaying={isAudioPlaying}
-      />
+      <AudioPlayer isPlaying={isAudioPlaying} />
 
       <AnimatePresence mode="wait">
         {currentPage === 0 ? (
