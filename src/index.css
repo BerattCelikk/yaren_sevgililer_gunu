@@ -29,4 +29,27 @@
       0 0 20px rgba(236, 72, 153, 0.5),
       0 4px 0 rgba(0, 0, 0, 0.3);
   }
+
+  .pixelated-transition {
+    background: repeating-conic-gradient(#000 0 25%, #0b0b0b 25% 50%);
+    animation: pixelFade 600ms ease forwards;
+  }
+
+  @keyframes pixelFade {
+    0% { opacity: 0; transform: scale(1.02); filter: none; }
+    50% { opacity: 1; transform: scale(1); filter: contrast(2) saturate(1.2) blur(0.6px); }
+    100% { opacity: 1; transform: scale(1); filter: none; }
+  }
+
+  .animate-shake {
+    animation: shake 420ms ease-in-out;
+  }
+
+  @keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    50% { transform: translateX(6px); }
+    75% { transform: translateX(-4px); }
+    100% { transform: translateX(0); }
+  }
 }

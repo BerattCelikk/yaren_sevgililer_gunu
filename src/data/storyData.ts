@@ -20,7 +20,8 @@ export const storyScenes: StoryScene[] = [
     videoSrc: '/videos/second_part_video.mp4',
     dialogue: [
       "Grup ödevi için heyecanla yerimizden kalkarken, ayağının uyuşmasıyla bir an sendeleyişin...",
-      "O an refleksle sana yardımcı olmaya çalışırken yaşadığım o tatlı telaş, aslında sana dair hislerimin ilk kıvılcımıydı. O küçük sakarlık, en büyük şansım oldu."
+      "O an refleksle sana yardımcı olmaya çalışırken yaşadığım o tatlı telaş, aslında sana dair hislerimin ilk kıvılcımıydı.",
+      "O küçük sakarlık, en büyük şansım oldu."
     ]
   },
   {
@@ -38,21 +39,27 @@ export const storyScenes: StoryScene[] = [
     videoSrc: '/videos/fourth_part_video.mp4',
     dialogue: [
       "Gecenin en karanlık anında bile, odamı aydınlatan tek şey telefonumun ekranı değil, senin kelimelerindi.",
-      "Saatler ilerlese de sana 'iyi geceler' deyip o bağı koparmaya kıyamıyordum. O anlarda aramızdaki mesafeler siliniyor, sadece sen ve ben kalıyorduk."
+      "Saatler ilerlese de sana 'iyi geceler' deyip o bağı koparmaya kıyamıyordum.",
+      "O anlarda aramızdaki mesafeler siliniyor, sadece sen ve ben kalıyorduk."
     ]
   },
   {
     id: 5,
     videoSrc: '/videos/fifth_part_video.mp4',
-    // Scene 5: split into two shorter parts
+    // Scene 5: split into three shorter parts for better readability
     dialogue: [
       "Sıradan bir kahve randevusundan, beraber paylaşılan sıcak bir yemeğe...",
-      "Seninle geçen her an, dünyadaki tüm dertleri unutturmaya yetiyor. Bakışlarındaki o huzuru bulduğumdan beri, başka hiçbir yer bana senin yanın kadar 'ev' gibi hissettirmedi."
+      "Seninle geçen her an, dünyadaki tüm dertleri unutturmaya yetiyor.",
+      "Bakışlarındaki o huzuru bulduğumdan beri, başka hiçbir yer bana senin yanın kadar 'ev' gibi hissettirmedi."
     ]
   },
   {
     id: 6,
     videoSrc: '/videos/sixth_part_video.mp4',
-    dialogue: 'Sevgilim olur musun? Sen benim için her şeyden çok daha değerlisin. 💕'
+    dialogue: [
+      "Bunca yolu benimle yürüdüğün, her engeli beraber aştığımız için teşekkür ederim.",
+      "Şimdi kalbimin kilidini açma vakti...",
+      "Yol boyunca topladığın o harfler, sana asıl söylemek istediğim kelimeyi fısıldıyor:"
+    ]
   }
 ];
