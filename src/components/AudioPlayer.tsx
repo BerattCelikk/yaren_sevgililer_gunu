@@ -49,7 +49,7 @@ export default function AudioPlayer({ audioSrc, isPlaying }: AudioPlayerProps) {
     if (!audioCtxRef.current) {
       audioCtxRef.current = new AudioContextCtor();
       masterGainRef.current = audioCtxRef.current.createGain();
-      masterGainRef.current.gain.value = isMuted ? 0 : 0.18;
+      masterGainRef.current.gain.value = isMuted ? 0 : 0.08;
       masterGainRef.current.connect(audioCtxRef.current.destination);
     }
 
@@ -85,7 +85,7 @@ export default function AudioPlayer({ audioSrc, isPlaying }: AudioPlayerProps) {
         filter.type = 'lowpass';
         filter.frequency.value = 1200;
         const nodeGain = ctx.createGain();
-        nodeGain.gain.value = 0.6 / (i + 1);
+        nodeGain.gain.value = 0.24 / (i + 1);
         osc.connect(filter);
         filter.connect(nodeGain);
         nodeGain.connect(chordGain);
